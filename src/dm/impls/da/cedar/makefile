@@ -1,8 +1,7 @@
--include ../../../../petscdir.mk
+-include ../../../../../petscdir.mk
+#requirespackage 'PETSC_HAVE_CEDAR'
 
-CFLAGS   = ${MATLAB_INCLUDE}
 LIBBASE  = libpetscdm
-DIRS     = usfft hypre cedar kokkos tests
 MANSEC   = DM
 SUBMANSEC= DMDA
 

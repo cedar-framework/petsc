@@ -109,6 +109,7 @@ typedef const char *MatType;
 #define MATHYPRE                     "hypre"
 #define MATHYPRESTRUCT               "hyprestruct"
 #define MATHYPRESSTRUCT              "hypresstruct"
+#define MATCEDAR                     "cedar"
 #define MATSUBMATRIX                 "submatrix"
 #define MATLOCALREF                  "localref"
 #define MATNEST                      "nest"
@@ -278,6 +279,9 @@ typedef const char *MatProductAlgorithm;
 #define MATPRODUCTALGORITHMCYCLIC          "cyclic"
 #if defined(PETSC_HAVE_HYPRE)
   #define MATPRODUCTALGORITHMHYPRE "hypre"
+#endif
+#if defined(PETSC_HAVE_CEDAR)
+  #define MATPRODUCTALGORITHMCEDAR "cedar"
 #endif
 
 PETSC_EXTERN PetscErrorCode MatProductCreate(Mat, Mat, Mat, Mat *);
