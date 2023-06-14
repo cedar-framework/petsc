@@ -8,11 +8,10 @@ typedef struct {
   MPI_Comm            hcomm;
   DM                  da;
 
-  cedar_config* c_config;
-  cedar_topo* c_topo;
-  cedar_mat* c_matrix;
+  cedar_mat c_matrix;
+  cedar_config c_config;
 
-  PetscBool needsinitialization;
+  PetscBool is_initialized;
 } Mat_CedarMatrix;
 
 #endif
