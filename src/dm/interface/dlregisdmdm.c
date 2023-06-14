@@ -32,6 +32,10 @@ PETSC_EXTERN PetscErrorCode MatCreate_HYPREStruct(Mat);
 PETSC_EXTERN PetscErrorCode MatCreate_HYPRESStruct(Mat);
 #endif
 
+#if defined(PETSC_HAVE_CEDAR)
+PETSC_EXTERN PetscErrorCode MatCreate_CedarMatrix(Mat);
+#endif
+
 /*@C
   DMInitializePackage - This function initializes everything in the `DM` package. It is called
   from `PetscDLLibraryRegister_petscdm()` when using dynamic libraries, and on the first call to `DMCreate()`
@@ -63,6 +67,9 @@ PetscErrorCode DMInitializePackage(void)
 #if defined(PETSC_HAVE_HYPRE)
   PetscCall(MatRegister(MATHYPRESTRUCT, MatCreate_HYPREStruct));
   PetscCall(MatRegister(MATHYPRESSTRUCT, MatCreate_HYPRESStruct));
+#endif
+#if defined(PETSC_HAVE_CEDAR)
+  PetscCall(MatRegister(MATCEDAR, MatCreate_CedarMatrix));
 #endif
   PetscCall(PetscSectionSymRegister(PETSCSECTIONSYMLABEL, PetscSectionSymCreate_Label));
 
