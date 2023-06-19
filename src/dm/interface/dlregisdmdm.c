@@ -34,7 +34,7 @@ PETSC_EXTERN PetscErrorCode MatCreate_HYPRESStruct(Mat);
 #endif
 
 #if defined(PETSC_HAVE_CEDAR)
-PETSC_EXTERN PetscErrorCode MatCreate_CedarMatrix(Mat);
+PETSC_EXTERN PetscErrorCode MatCreate_Cedar(Mat);
 #endif
 
 /*@C
@@ -66,7 +66,7 @@ PetscErrorCode DMInitializePackage(void)
   PetscCall(MatRegister(MATHYPRESSTRUCT, MatCreate_HYPRESStruct));
 #endif
 #if defined(PETSC_HAVE_CEDAR)
-  PetscCall(MatRegister(MATCEDAR, MatCreate_CedarMatrix));
+  PetscCall(MatRegister(MATCEDAR, MatCreate_Cedar));
 #endif
   PetscCall(PetscSectionSymRegister(PETSCSECTIONSYMLABEL, PetscSectionSymCreate_Label));
 

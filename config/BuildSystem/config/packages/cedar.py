@@ -8,15 +8,20 @@ class Configure(config.package.CMakePackage):
     self.versionname = 'CEDAR_GIT_VERSION'
     self.gitcommit = '8642979198120b3546fe43d6eb74e3ee9bc18b41' # master commit, as of 12 June 2023
     self.download = ['git://https://github.com/cedar-framework/cedar.git']
-    self.includes = ['capi.h']
+    self.includes = ['cedar/capi.h']
     self.liblist = [['libcedar.a']]
-    self.functions = ['']
+    self.functions = ['cedar_config_create',
+                      'cedar_log_init',
+                      'cedar_topo_create2d',
+                      'cedar_mat_create2d',
+                      'cedar_topo_create3d',
+                      'cedar_mat_create3d']
     self.hastests = 1
     self.hastestsdatafiles = 1
     self.precisions = ['double']
     self.buildLanguages = ['Cxx']
     self.minCxxVersion = 'c++14'
-    self.builtafterpetsc = 1
+    self.builtafterpetsc = 0
     self.minCmakeVersion = (3,14,0)
 
   def setupHelp(self, help):
