@@ -101,6 +101,10 @@ PETSC_EXTERN PetscErrorCode MatCreate_Dummy(Mat);
 PETSC_EXTERN PetscErrorCode MatCreate_HYPRE(Mat);
 #endif
 
+#if defined(PETSC_HAVE_CEDAR)
+PETSC_EXTERN PetscErrorCode MatCreate_Cedar(Mat);
+#endif
+
 PETSC_EXTERN PetscErrorCode MatCreate_ConstantDiagonal(Mat);
 PETSC_INTERN PetscErrorCode MatCreate_Diagonal(Mat);
 
@@ -250,6 +254,10 @@ PetscErrorCode MatRegisterAll(void)
 
 #if defined(PETSC_HAVE_HYPRE)
   PetscCall(MatRegister(MATHYPRE, MatCreate_HYPRE));
+#endif
+
+#if defined(PETSC_HAVE_CEDAR)
+  PetscCall(MatRegister(MATCEDAR, MatCreate_Cedar));
 #endif
 
 #if defined(PETSC_HAVE_H2OPUS)
