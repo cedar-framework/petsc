@@ -111,6 +111,7 @@ typedef const char *MatType;
 #define MATHYPRE                     "hypre"
 #define MATHYPRESTRUCT               "hyprestruct"
 #define MATHYPRESSTRUCT              "hypresstruct"
+#define MATCEDARSYM                  "cedarsym"
 #define MATCEDAR                     "cedar"
 #define MATSUBMATRIX                 "submatrix"
 #define MATLOCALREF                  "localref"

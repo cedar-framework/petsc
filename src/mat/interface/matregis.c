@@ -258,6 +258,7 @@ PetscErrorCode MatRegisterAll(void)
 
 #if defined(PETSC_HAVE_CEDAR)
   PetscCall(MatRegister(MATCEDAR, MatCreate_Cedar));
+  PetscCall(MatRegister(MATCEDARSYM, MatCreate_Cedar));
 #endif
 
 #if defined(PETSC_HAVE_H2OPUS)

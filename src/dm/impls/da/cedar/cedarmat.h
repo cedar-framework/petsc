@@ -17,6 +17,11 @@ typedef struct {
   cedar_config c_config;
   cedar_topo c_topo;
 
+  union {
+    cedar_stencil_2d c_stencil_2d;
+    cedar_stencil_3d c_stencil_3d;
+  };
+
   PetscBool is_initialized;
 } Mat_CedarMatrix;
 

@@ -70,6 +70,7 @@ PetscErrorCode DMInitializePackage(void)
 #endif
 #if defined(PETSC_HAVE_CEDAR)
   PetscCall(MatRegister(MATCEDAR, MatCreate_Cedar));
+  PetscCall(MatRegister(MATCEDARSYM, MatCreate_Cedar));
 #endif
   PetscCall(PetscSectionSymRegister(PETSCSECTIONSYMLABEL, PetscSectionSymCreate_Label));
 
