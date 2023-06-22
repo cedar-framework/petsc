@@ -293,6 +293,18 @@ PetscErrorCode MatSetValuesLocal_Cedar3D(Mat mat, PetscInt nrow, const PetscInt 
 }
 #pragma GCC diagnostic pop
 
+static PetscErrorCode MatView_Cedar(Mat A, PetscViewer view) {
+  Mat_CedarMatrix* ex = (Mat_CedarMatrix*) A->data;
+  PetscViewerFormat format;
+
+  PetscFunctionBegin;
+  PetscCall(PetscViewerGetFormat(view, &format)); /* todo: do something with the viewer format */
+  FILE* fd;
+  PetscViewerASCIIGetPointer(view, &fd);
+  PetscCall(cedar_mat_dump_file(ex->c_matrix, fd));
+  PetscFunctionReturn(PETSC_SUCCESS);
+}
+
 PetscErrorCode MatSetUp_Cedar(Mat mat)
 {
   DM da;
@@ -380,6 +392,7 @@ PETSC_EXTERN PetscErrorCode MatCreate_Cedar(Mat B)
   B->ops->mult = MatMult_Cedar;
   B->ops->zeroentries = MatZeroEntries_Cedar;
   B->ops->setup = MatSetUp_Cedar;
+  B->ops->view = MatView_Cedar;
 
   cmat->is_initialized = PETSC_FALSE;
 
