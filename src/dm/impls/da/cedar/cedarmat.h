@@ -2,6 +2,8 @@
 #define _CEDARMAT_H
 
 #include <petscdmda.h> /*I "petscdmda.h" I*/
+#include <petscvec.h>
+
 #define ENABLE_3D
 #include <cedar/capi.h>
 #undef ENABLE_3D
@@ -24,5 +26,10 @@ typedef struct {
 
   PetscBool is_initialized;
 } Mat_CedarMatrix;
+
+PetscErrorCode cedar_vec_copy_to(const PetscScalar* source, cedar_vec dest);
+PetscErrorCode cedar_vec_copy_from(cedar_vec source, PetscScalar* dest);
+PetscErrorCode petsc_vec_to_cedar_vec(Vec source, cedar_vec dest);
+PetscErrorCode cedar_vec_to_petsc_vec(cedar_vec source, Vec dest);
 
 #endif
