@@ -1,7 +1,6 @@
 #include <petscsys.h>
 #include <petsc/private/matimpl.h>
 #include <petscdmda.h> /*I "petscdmda.h" I*/
-#include <petscvec.h>
 #include <../src/dm/impls/da/cedar/cedarmat.h>
 
 static PetscBool cedar_initialized = PETSC_FALSE;
@@ -37,7 +36,7 @@ static PetscErrorCode cedar_initialize(cedar_config* config)
 }
 
 /* These are based on the Stella implementations: https://github.com/andrewreisner/stella/blob/master/src/stella_cedar.c */
-static PetscErrorCode cedar_vec_copy_to(const PetscScalar* source, cedar_vec dest) {
+PetscErrorCode cedar_vec_copy_to(const PetscScalar* source, cedar_vec dest) {
   cedar_real* dest_ptr;
   int dim;
   cedar_len i, j, k;
@@ -71,7 +70,18 @@ static PetscErrorCode cedar_vec_copy_to(const PetscScalar* source, cedar_vec des
   PetscFunctionReturn(PETSC_SUCCESS);
 }
 
-static PetscErrorCode cedar_vec_copy_from(cedar_vec source, PetscScalar* dest) {
+PetscErrorCode petsc_vec_to_cedar_vec(Vec source, cedar_vec dest) {
+  const PetscScalar* source_ptr;
+
+  PetscFunctionBegin;
+  PetscCall(VecGetArrayRead(source, &source_ptr));
+  PetscCall(cedar_vec_copy_to(source_ptr, dest));
+  PetscCall(VecRestoreArrayRead(source, &source_ptr));
+
+  PetscFunctionReturn(PETSC_SUCCESS);
+}
+
+PetscErrorCode cedar_vec_copy_from(cedar_vec source, PetscScalar* dest) {
   cedar_real* source_ptr;
   int dim;
   cedar_len i, j, k;
@@ -105,12 +115,20 @@ static PetscErrorCode cedar_vec_copy_from(cedar_vec source, PetscScalar* dest) {
   PetscFunctionReturn(PETSC_SUCCESS);
 }
 
+PetscErrorCode cedar_vec_to_petsc_vec(cedar_vec source, Vec dest) {
+  PetscScalar* dest_ptr;
+
+  PetscFunctionBegin;
+  PetscCall(VecGetArrayWrite(dest, &dest_ptr));
+  PetscCall(cedar_vec_copy_from(source, dest_ptr));
+  PetscCall(VecRestoreArrayWrite(dest, &dest_ptr));
+
+  PetscFunctionReturn(PETSC_SUCCESS);
+}
+
 PetscErrorCode MatMult_Cedar(Mat A, Vec x, Vec y)
 {
   Mat_CedarMatrix* ex = (Mat_CedarMatrix*) A->data;
-  const PetscScalar* x_ptr = PETSC_NULLPTR;
-  PetscScalar* y_ptr = PETSC_NULLPTR;
-
   cedar_vec c_x = CEDAR_VEC_NULL, c_y = CEDAR_VEC_NULL;
   cedar_topo c_topo = ex->c_topo;
 
@@ -126,28 +144,9 @@ PetscErrorCode MatMult_Cedar(Mat A, Vec x, Vec y)
   }
 
   /* Perform the mat-vec, copying data to and from Cedar/Petsc */
-  PetscCall(VecGetArrayRead(x, &x_ptr));
-  PetscCall(cedar_vec_copy_to(x_ptr, c_x));
-  PetscCall(VecRestoreArrayRead(x, &x_ptr));
-
+  PetscCall(petsc_vec_to_cedar_vec(x, c_x));
   PetscCall(cedar_matvec(ex->c_matrix, c_x, c_y));
-
-  PetscCall(VecGetArrayWrite(y, &y_ptr));
-  PetscCall(cedar_vec_copy_from(c_y, y_ptr));
-  PetscCall(VecRestoreArrayWrite(y, &y_ptr));
-
-  /* for (int i = 0; i < ex->Nx * ex->Ny; ++i) { */
-  /*   printf("%f ", x_ptr[i]); */
-  /* } */
-  /* printf("\n"); */
-
-  /* for (int i = 0; i < ex->Nx * ex->Ny; ++i) { */
-  /*   printf("%f ", y_ptr[i]); */
-  /* } */
-  /* printf("\n"); */
-
-  /* PetscCall(VecRestoreArrayRead(x, &x_ptr)); */
-  /* PetscCall(VecRestoreArrayWrite(y, &y_ptr)); */
+  PetscCall(cedar_vec_to_petsc_vec(c_y, y));
 
   /* Free scratch space for Cedar */
   PetscCall(cedar_vec_free(&c_x));
