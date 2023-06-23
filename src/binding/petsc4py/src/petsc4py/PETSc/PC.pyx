@@ -52,6 +52,7 @@ class PCType(object):
     DEFLATION          = S_(PCDEFLATION)
     HPDDM              = S_(PCHPDDM)
     H2OPUS             = S_(PCH2OPUS)
+    CEDAR              = S_(PCCEDAR)
 
 
 class PCSide(object):

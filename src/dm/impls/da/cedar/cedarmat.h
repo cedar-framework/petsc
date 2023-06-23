@@ -9,11 +9,12 @@
 #undef ENABLE_3D
 
 typedef struct {
-  MPI_Comm            hcomm;
-  DM                  da;
+  MPI_Comm hcomm;
+  DM da;
 
   PetscInt dim;
-  PetscInt Nx, Ny, Nz;
+  PetscInt gnx, gny, gnz; /* global dimensions */
+  PetscInt lnx, lny, lnz; /* local dimensions */
 
   cedar_mat c_matrix;
   cedar_config c_config;

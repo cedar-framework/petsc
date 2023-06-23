@@ -95,6 +95,8 @@ class MatType(object):
     CONSTANTDIAGONAL = S_(MATCONSTANTDIAGONAL)
     DIAGONAL         = S_(MATDIAGONAL)
     H2OPUS           = S_(MATH2OPUS)
+    CEDAR           = S_(MATCEDAR)
+    CEDARSYM        = S_(MATCEDARSYM)
 
 
 class MatOption(object):
