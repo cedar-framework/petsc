@@ -91,6 +91,8 @@ class MatType(object):
     LMVMDIAGBBROYDEN = S_(MATLMVMDIAGBROYDEN)
     CONSTANTDIAGONAL = S_(MATCONSTANTDIAGONAL)
     H2OPUS           = S_(MATH2OPUS)
+    CEDAR           = S_(MATCEDAR)
+    CEDARSYM        = S_(MATCEDARSYM)
 
 class MatOption(object):
     """Matrix option.

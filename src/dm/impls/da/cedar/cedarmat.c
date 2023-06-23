@@ -183,9 +183,9 @@ PetscErrorCode MatSetValuesLocal_Cedar2D(Mat mat, PetscInt nrow, const PetscInt 
   cedar_coord_2d stencil_coords[9];
   cedar_real stencil_values[9];
   Mat_CedarMatrix* ex = (Mat_CedarMatrix*) mat->data;
-  const PetscInt Nx = ex->Nx;
-  const PetscInt Ny = ex->Ny;
-  const PetscInt stride = Nx;
+  const PetscInt gnx = ex->gnx;
+  const PetscInt gny = ex->gny;
+  const PetscInt stride = gnx;
 
   PetscFunctionBegin;
   PetscCheck(ins_mode == INSERT_VALUES, PETSC_COMM_SELF, PETSC_ERR_SUP, "Only setting values is supported (no updates).");
@@ -206,16 +206,16 @@ PetscErrorCode MatSetValuesLocal_Cedar2D(Mat mat, PetscInt nrow, const PetscInt 
       if (offset == 0) {
         stencil_coords[colptr].dir = BMG2_C;
         valid = PETSC_TRUE;
-      } else if (offset == stride && j < Ny) {
+      } else if (offset == stride && j < gny) {
         stencil_coords[colptr].dir = BMG2_N;
         valid = PETSC_TRUE;
-      } else if (offset == stride + 1 && j < Ny && i < Nx) {
+      } else if (offset == stride + 1 && j < gny && i < gnx) {
         stencil_coords[colptr].dir = BMG2_NE;
         valid = PETSC_TRUE;
-      } else if (offset == 1 && i < Nx) {
+      } else if (offset == 1 && i < gnx) {
         stencil_coords[colptr].dir = BMG2_E;
         valid = PETSC_TRUE;
-      } else if (offset == -stride + 1 && j > 0 && i < Nx) {
+      } else if (offset == -stride + 1 && j > 0 && i < gnx) {
         stencil_coords[colptr].dir = BMG2_SE;
         valid = PETSC_TRUE;
       } else if (offset == -stride && j > 0) {
@@ -227,7 +227,7 @@ PetscErrorCode MatSetValuesLocal_Cedar2D(Mat mat, PetscInt nrow, const PetscInt 
       } else if (offset == -1 && i > 0) {
         stencil_coords[colptr].dir = BMG2_W;
         valid = PETSC_TRUE;
-      } else if (offset == stride - 1 && j < Ny && i > 0) {
+      } else if (offset == stride - 1 && j < gny && i > 0) {
         stencil_coords[colptr].dir = BMG2_NW;
         valid = PETSC_TRUE;
       }
@@ -249,7 +249,7 @@ PetscErrorCode MatZeroRowsLocal_Cedar2D(Mat mat, PetscInt nrow, const PetscInt i
   cedar_real stencil_values[9] = {0};
   PetscInt i, j;
   Mat_CedarMatrix* ex = (Mat_CedarMatrix*) mat->data;
-  const PetscInt stride = ex->Nx;
+  const PetscInt stride = ex->gnx;
 
   PetscFunctionBegin;
   PetscCheck(!x || !b, PetscObjectComm((PetscObject)mat), PETSC_ERR_SUP, "No support");
@@ -282,8 +282,8 @@ PetscErrorCode MatSetValuesLocal_Cedar3D(Mat mat, PetscInt nrow, const PetscInt 
   cedar_coord_2d stencil_coords[9];
   cedar_real stencil_values[9];
   Mat_CedarMatrix* ex = (Mat_CedarMatrix*) mat->data;
-  const PetscInt stride1 = ex->Nx;
-  const PetscInt stride2 = ex->Nx * ex->Ny;
+  const PetscInt stride1 = ex->gnx;
+  const PetscInt stride2 = ex->gnx * ex->gny;
 
   PetscFunctionBegin;
   PetscCheck(ins_mode == INSERT_VALUES, PETSC_COMM_SELF, PETSC_ERR_SUP, "Only setting values is supported (no updates).");
@@ -308,7 +308,7 @@ static PetscErrorCode MatView_Cedar(Mat A, PetscViewer view) {
 PetscErrorCode MatSetUp_Cedar(Mat mat)
 {
   DM da;
-  PetscInt dim, Nx, Ny, Nz, Px, Py, Pz, dof, psw;
+  PetscInt dim, gnx, gny, gnz, Px, Py, Pz, dof, psw;
   const PetscInt* Lx = PETSC_NULLPTR, *Ly = PETSC_NULLPTR, *Lz = PETSC_NULLPTR;
   unsigned int* c_Lx = PETSC_NULLPTR, *c_Ly = PETSC_NULLPTR, *c_Lz = PETSC_NULLPTR;
   DMBoundaryType Bx, By, Bz;
@@ -320,11 +320,11 @@ PetscErrorCode MatSetUp_Cedar(Mat mat)
 
   /* Grab information about the DM */
   PetscCall(MatGetDM(mat, (DM*) &da));
-  PetscCall(DMDAGetInfo(da, &dim, &Nx, &Ny, &Nz, &Px, &Py, &Pz, &dof, &psw, &Bx, &By, &Bz, &stencil_type));
+  PetscCall(DMDAGetInfo(da, &dim, &gnx, &gny, &gnz, &Px, &Py, &Pz, &dof, &psw, &Bx, &By, &Bz, &stencil_type));
   PetscCall(DMDAGetOwnershipRanges(da, &Lx, &Ly, &Lz));
 
   ex->dim = dim;
-  ex->Nx = Nx; ex->Ny = Ny; ex->Nz = Nz;
+  ex->gnx = gnx; ex->gny = gny; ex->gnz = gnz;
 
   /* Convert Lx, Ly, Lz to correct Cedar types */
   PetscCall(PetscMalloc1(sizeof(unsigned int) * Px, &c_Lx));
@@ -352,14 +352,14 @@ PetscErrorCode MatSetUp_Cedar(Mat mat)
   if (dim == 2) {
     cedar_stencil_2d cedar_stencil_type = (stencil_type == DMDA_STENCIL_STAR ? CEDAR_STENCIL_FIVE_PT : CEDAR_STENCIL_NINE_PT);
     ex->c_stencil_2d = cedar_stencil_type;
-    PetscCall(cedar_topo_create2d(comm, Nx, Ny, c_Lx, c_Ly, Px, Py, &ex->c_topo));
+    PetscCall(cedar_topo_create2d(comm, gnx, gny, c_Lx, c_Ly, Px, Py, &ex->c_topo));
     PetscCall(cedar_mat_create2d(ex->c_config, ex->c_topo, cedar_stencil_type, &ex->c_matrix));
     mat->ops->setvalueslocal = MatSetValuesLocal_Cedar2D;
     mat->ops->zerorowslocal  = MatZeroRowsLocal_Cedar2D;
   } else {
     cedar_stencil_3d cedar_stencil_type = (stencil_type == DMDA_STENCIL_STAR ? CEDAR_STENCIL_SEVEN_PT : CEDAR_STENCIL_XXVII_PT);
     ex->c_stencil_3d = cedar_stencil_type;
-    PetscCall(cedar_topo_create3d(comm, Nx, Ny, Nz, c_Lx, c_Ly, c_Lz, Px, Py, Pz, &ex->c_topo));
+    PetscCall(cedar_topo_create3d(comm, gnx, gny, gnz, c_Lx, c_Ly, c_Lz, Px, Py, Pz, &ex->c_topo));
     PetscCall(cedar_mat_create3d(ex->c_config, ex->c_topo, cedar_stencil_type, &ex->c_matrix));
     mat->ops->setvalueslocal = MatSetValuesLocal_Cedar3D;
   }

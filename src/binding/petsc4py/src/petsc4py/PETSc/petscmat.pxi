@@ -84,6 +84,8 @@ cdef extern from * nogil:
     PetscMatType MATLMVMDIAGBROYDEN
     PetscMatType MATCONSTANTDIAGONAL
     PetscMatType MATH2OPUS
+    PetscMatType MATCEDAR
+    PetscMatType MATCEDARSYM
 
     ctypedef const char* PetscMatOrderingType "MatOrderingType"
     PetscMatOrderingType MATORDERINGNATURAL
