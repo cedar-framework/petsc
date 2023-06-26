@@ -14,7 +14,11 @@ typedef struct {
 
   PetscInt dim;
   PetscInt gnx, gny, gnz; /* global dimensions */
-  PetscInt lnx, lny, lnz; /* local dimensions */
+  PetscInt lx, ly, lz, lm, ln, lp; /* local coordinates: starting positions (x,y,z) and sizes (m,n,p) */
+  PetscInt lgx, lgy, lgz, lgm, lgn, lgp; /* local ghost coordinates: starting positions (x,y,z) and sizes (m,n,p) */
+
+  PetscInt row_start;
+  const PetscInt* global_indices;
 
   cedar_mat c_matrix;
   cedar_config c_config;
